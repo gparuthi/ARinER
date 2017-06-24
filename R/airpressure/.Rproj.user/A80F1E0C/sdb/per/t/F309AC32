@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1497654916103.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "F309AC32",
+    "lastKnownWriteTime" : 4329803288,
+    "last_content_update" : 1497654916103,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "9E5ECA05",
+        "caption" : "df_sfo",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=df_sfo&cache_key=9E5ECA05",
+        "displayedObservations" : "167",
+        "environment" : "",
+        "object" : "df_sfo",
+        "preview" : "0",
+        "totalObservations" : "167",
+        "variables" : "4"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

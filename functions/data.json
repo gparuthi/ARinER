@@ -1,0 +1,10 @@
+{
+  "modelName": "KNN",
+  "kdtree": {
+    "left": null,
+    "right": null,
+    "parent": null
+  },
+  "k": 4,
+  "classes": 2
+}

@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(weatherData)\n\ndf_sfo <- getWeatherForYear(\"SFO\", 2017)\ndf_sfo",
+    "created" : 1497654673956.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1296854010",
+    "id" : "64EA92C8",
+    "lastKnownWriteTime" : 1497733116,
+    "last_content_update" : 1497733116361,
+    "path" : "~/Dropbox/airp-website/R/airpressure/1.R",
+    "project_path" : "1.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
