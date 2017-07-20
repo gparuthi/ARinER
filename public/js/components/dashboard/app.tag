@@ -60,12 +60,6 @@
     this.on("mount", function(){
       // firebase.database().ref('/').once('value',s=> appTag.log("data", s.val()))
 
-      token = "ef33fce3cd717d454a36a04ba34eb144bd7a5ea7"
-      particle = new Particle()
-
-      //Get all events
-      self.initiateEventStreams()
-      
       route.exec()
     })
 
@@ -74,82 +68,6 @@
       return Math.round(newval)
     }
 
-    initiateEventStreams(){
-
-      console.log('here')
-      particle.getEventStream({ deviceId:'2b0045000247353138383138', auth: token}).then(function(stream) {
-        stream.on('event', function(data) {
-          event = data
-          // console.log("Event: " + data.name, event);
-          var sensorvalue = self.mapRange(event.data,0,100,92,104)
-          if (event.name == "sensor:light"){
-            var saveObject = {'device':'a', 'type': "F", "value": sensorvalue, "published_at": event.published_at}
-            // console.log(saveObject);
-            self.saveSensorDataToFB('room1_temperature', saveObject)
-            vizTag.updateVals(sensorvalue, 0)
-          }
-        });
-      });
-
-      particle.getEventStream({ deviceId:'28003b000447333437333039', auth: token}).then(function(stream) {
-        stream.on('event', function(data) {
-          event = data
-          // console.log("Event: " + data.name, event);
-          var sensorvalue = self.mapRange(event.data,0,100,80,140)
-          if (event.name == "sensor:light"){
-            var saveObject = {'device':'b', 'type': "mmHg", "value": sensorvalue, "published_at": event.published_at}
-            self.saveSensorDataToFB('bloodpressure', saveObject)
-
-            vizTag.updateVals(sensorvalue, 3)
-          }
-        });
-      });
-
-
-      self.bloodInterval = setInterval(function(){
-        self.saveSensorDataToFB('heartrate', {"device":"heartrate","published_at":moment().format(),"type":"BPM","value":self.getBloodP()})
-
-        self.saveSensorDataToFB('ivdrip', {"device":"ivdrip","published_at":moment().format(),"type":"ml","value":self.getIVValue()})
-
-        
-      }, 2000)
-
-
-    }
-
-    self.heartrateValue = 100;
-    getBloodP(){
-      self.heartrateValue += 1;
-      if (self.heartrateValue > 120){
-        self.heartrateValue = 110
-      }
-      vizTag.updateVals(self.heartrateValue, 1)
-      return self.heartrateValue
-    }
-
-    self.ivValue = 110;
-    getIVValue(){
-      self.ivValue += 3;
-      if (self.ivValue > 900){
-        self.ivValue = 110
-      }
-      vizTag.updateVals(self.ivValue, 2)
-      return self.ivValue
-    }
-
-    saveSensorDataToFB(name, data){
-      updates = {}
-      updates['sensors/'+name+'/currentdata'] = data
-      // updates['sensors/'+name+'/history/'+moment().format()] = data
-      firebase.database().ref().update(updates)
-    }
-
-    d(){
-      updates = {}
-      updates['sensors/bloodpressure/'] = {"currentdata":{"device":"a","published_at":"2017-06-30T13:35:06.600Z","type":"BPM","value":120},"device":"bloodp"}
-      // updates['sensors/'+name+'/history/'+moment().format()] = data
-      firebase.database().ref().update(updates)
-    }
 
 
     click(e){

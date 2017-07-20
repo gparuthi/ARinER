@@ -2,34 +2,32 @@
 
 <vizualize>
 <div class="container">
-	<div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
-            <svg each={data} fill={color} width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
-              <use xlink:href="#piechart" mask="url(#piemask)" />
-              <text x="0.5" y="0.5" font-family="Roboto" font-size="0.3" fill="white" text-anchor="middle" dy="0.1">{value}<tspan font-size="0.1" dy="-0.07">{unit}</tspan></text>
-            </svg>
+<div class="mdl-grid">
+	<div class="mdl-cell mdl-cell--12-col"><h3>Hourly Plot</h3></div>
+	<div id="tester" class="mdl-cell mdl-cell--12-col"></div>
+	<div class="mdl-cell mdl-cell--12-col">
+		<h3>Last Image</h3>
+		<img src={lastImage}>
+	</div>
+	<div class="mdl-grid">
+		<div class="mdl-cell mdl-cell--12-col"><h3>Hourly Data</h3></div>
+		<div class="mdl-cell mdl-cell--3-col" each={v,k in data}>
+		<strong>{k}</strong>
+			<div each={c, h in v.hourly}>{h} : {c}</div>
+		</div>
+	</div>
 	
-		<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" style="position: fixed; left: -1000px; height: -1000px;">
-        <defs>
-          <mask id="piemask" maskContentUnits="objectBoundingBox">
-            <circle cx=0.5 cy=0.5 r=0.49 fill="white" />
-            <circle cx=0.5 cy=0.5 r=0.40 fill="black" />
-          </mask>
-          <g id="piechart">
-            <circle cx=0.5 cy=0.5 r=0.5 />
-            <path d="M {getM1()} {getM1()} {getM1()} 0 A 0.5 0.5 0 0 1 0.95 0.28 z" stroke="none" fill="rgba(255, 255, 255, 0.75)" />
-          </g>
-        </defs>
-      </svg>
+	  
+
+	
 	
 </div>
 
 <script>
 vizTag = this
 var self = this
-self.data = [{value: 120, color:"#FFA005",unit: "F"},  
-			{value: 100, color:"#E8520C",unit: "BPM"}, 
-			{value: 100, color:"#DD0CE8",unit: "ml"}, 
-			{value: 100, color:"rgba(0, 255, 255, 0.75)",unit: "mmHg"}]
+
+self.lastImage = ""
 
 self.m1 = 0.5
 
@@ -38,15 +36,50 @@ getM1(){
 }
 
 this.on("mount", function(){
-	// self.interval = setInterval(self.updateLocations, 20000)
-	// self.updateLocations()
-	setInterval(function(){
-		self.m1+=0.05
-		if (self.m1>0.75)
-			self.m1 = 0.5
-		console.log(self.m1)
-		self.update()
-	}, 1000)
+
+	firebase.storage().ref('images').child('apple.jpg').getDownloadURL().then(url => {
+		console.log(url);
+		self.lastImage = url;
+		self.update();
+	})
+
+	firebase.database().ref('/visionresults').once("value", function(s){
+	 d = s.val()
+	 data = {}
+	 		 _.each(_.values(d), r=>{
+	 		 	classes = r.objects
+	 		 	_.each(_.pairs(classes), c=>{
+	 		 		let className = c[0]
+	 		 		if (!data[className])
+	 		 			data[className] = {x:[r.timestamp],y:[0], name: className, hourly:{}} 
+	 				hour = moment(r.timestamp).format('YYYY-MM-DDTHH')
+	 				if (!data[className]['hourly'][hour])
+	 					data[className]['hourly'][hour] = 0
+	 				data[className]['hourly'][hour]+= c[1]
+	 // 		 		data[className]['x'].push(r.timestamp)
+	 // 		 		data[className]['y'].push(c[1])
+	 		 		// console.log(className, data[className]['hourly'])
+	 		 	})
+	 		 })
+
+	 		 // groupby hourly
+		 _.each(_.keys(data), c=>{
+			console.log(c)
+			data[c]['x'] = _.map(_.keys(data[c].hourly), t=> {return moment(t).format()})
+			data[c]['y'] = _.values(data[c].hourly)
+		})
+
+		 TESTER = document.getElementById('tester')
+	 	Plotly.plot( TESTER, _.values(data), {margin: { t: 0 } } )
+	 	self.update()
+	})
+	// TESTER = document.getElementById('tester');
+	// Plotly.plot( TESTER, [{
+	// x: [1, 2, 3, 4, 5],
+	// y: [1, 2, 4, 8, 16], name:"1" },{
+	// x: [2, 3, 4, 5, 6],
+	// y: [1, 2, 4, 8, 16], name:"2" }], {
+	// margin: { t: 0 } } );
 })
 
 updateVals(d, i){
@@ -58,12 +91,12 @@ updateVals(d, i){
 
 <style>
 .demo-charts {
-	background-color: black !important;
+	/*background-color: black !important;*/
 }
 .container {
 	width: 100%;
 	height: 100%;
-	background-color: black !important;
+	/*background-color: black !important;*/
 }
 
 </style>
