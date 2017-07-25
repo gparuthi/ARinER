@@ -1,3 +1,57 @@
+<controls>
+<div class ="container">
+  <div class="demo-card-wide mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title">
+        Particle States
+        </div>
+        <div class="mdl-card__supporting-text">
+          <button onclick={state1Click}  class="mdl-button mdl-js-button"> <span>green</span></button>
+              <button onclick={state2Click}  class="mdl-button mdl-js-button"> <span>yellow</span></button>
+              <button onclick={state3Click}  class="mdl-button mdl-js-button"> <span>red</span></button>
+              <button onclick={offClick}  class="mdl-button mdl-js-button"> <span>off</span></button>
+        </div>
+  </div>
+  <div class="demo-card-wide mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title">
+        Web app
+        </div>
+        <div class="mdl-card__supporting-text">
+          <button onclick={Wsitu1Click}  class="mdl-button mdl-js-button"> <span>situ1</span></button>
+              <button onclick={Wsitu2Click}  class="mdl-button mdl-js-button"> <span>situ2</span></button>
+              <button onclick={Wsitu3Click}  class="mdl-button mdl-js-button"> <span>situ3</span></button>
+        </div>
+  </div>
+</div>
+ 
+
+  <script>
+    state1Click(){
+      particle.callFunction({name:'led', deviceId: '28003b000447333437333039', argument: 'state1' , auth:token})
+    }
+    state2Click(){
+      particle.callFunction({name:'led', deviceId: '28003b000447333437333039', argument: 'state2' , auth:token})
+    }
+    state3Click(){
+      particle.callFunction({name:'led', deviceId: '28003b000447333437333039', argument: 'state3' , auth:token})
+    }
+    offClick(){
+      particle.callFunction({name:'led', deviceId: '28003b000447333437333039', argument: 'off' , auth:token})
+    }
+
+
+    Wsitu1Click(){
+      particle.publishEvent({name:'webapp-controller', data: 'situ1' , auth:token})
+    }
+    Wsitu2Click(){
+      particle.publishEvent({name:'webapp-controller', data: 'situ2' , auth:token})
+    }
+    Wsitu3Click(){
+      particle.publishEvent({name:'webapp-controller', data: 'situ3' , auth:token})
+    }
+
+  </script>
+</controls>
+
 <app>
   <!-- Simple header with fixed tabs. -->
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
@@ -13,7 +67,8 @@
   <main class="mdl-layout__content">
     <section class="mdl-layout__tab-panel is-active"  id="logs">
       <div class="page-content" hide={page.id != "logs"}>
-        <clogs showeventlabels=true loadfrom="logs"></clogs>
+        <!-- <clogs showeventlabels=true loadfrom="logs"></clogs> -->
+        <controls></controls>
       </div>
     </section>
     <!-- <section class="mdl-layout__tab-panel is-active"  id="clogs">
@@ -59,15 +114,29 @@
 
     this.on("mount", function(){
       // firebase.database().ref('/').once('value',s=> appTag.log("data", s.val()))
+      token = "46a6d7385b7db671f0005f5e628405906fa28d84"
+      particle = new Particle()
+      self.initiateEventStreams()
 
       route.exec()
     })
 
-    mapRange(value, in_min, in_max, out_min, out_max) {
-      var newval = (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
-      return Math.round(newval)
-    }
+    initiateEventStreams(){
 
+      console.log('here1')
+      
+      particle.getEventStream({ deviceId:'28003b000447333437333039', auth: token}).then(function(stream) {
+        stream.on('event', function(data) {
+          event = data
+          console.log('event')
+          // console.log("Event: " + data.name, event);
+          if (event.name == "ButtonDetected"){
+            console.log('detected', event)
+          }
+        });
+      });
+
+    }
 
 
     click(e){
